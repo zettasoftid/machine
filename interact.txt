@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tron Payment</title>
+</head>
+<body>
+    <h1>Tron Payment</h1>
+    <p>Saldo TRX Anda: <span id="balance">Memuat...</span> TRX</p>
+    <input type="number" id="trxAmount" placeholder="Jumlah TRX">
+    <button onclick="sendTRX()">Kirim TRX</button>
+
+    <script src="https://cdn.jsdelivr.net/gh/tronprotocol/wallet.js/dist/walletsdk.js"></script>
+    <script>
+        // Gantilah dengan alamat kontrak Anda
+        const contractAddress = '0xYourContractAddress';
+        
+        const tronWeb = window.tronWeb;
+        
+        async function getBalance() {
+            const balance = await tronWeb.trx.getBalance(contractAddress);
+            return tronWeb.fromSun(balance);
+        }
+        
+        async function updateBalance() {
+            const balanceElement = document.getElementById('balance');
+            const trxBalance = await getBalance();
+            balanceElement.textContent = trxBalance;
+        }
+        
+        async function sendTRX() {
+            const trxAmount = document.getElementById('trxAmount').value;
+            const trxAmountSun = tronWeb.toSun(trxAmount);
+            
+            try {
+                await tronWeb.trx.sendTransaction(contractAddress, trxAmountSun);
+                alert('Transaksi berhasil!');
+                updateBalance();
+            } catch (error) {
+                console.error('Transaksi gagal:', error);
+                alert('Transaksi gagal: ' + error.message);
+            }
+        }
+        
+        async function init() {
+            if (typeof window.tronWeb === 'undefined') {
+                setTimeout(init, 100);
+            } else {
+                updateBalance();
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>
