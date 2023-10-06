@@ -5,8 +5,16 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
 
+from pathlib import Path
+from os.path import join
+
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "https://zetta-ai-checker.vercel.app"}})
+
+# ROOT PATH
+
+BASE_DIR = Path(__file__).resolve().parent
+
 
 # Variabel global untuk menyimpan hasil pencocokan
 matches_result = []
@@ -19,7 +27,7 @@ def process_contract():
         contract_address = data.get('contract_address')
 
         # Jalankan skrip Selenium dengan contract address sebagai argumen
-        subprocess.run(['python', './scrape_tron.py', contract_address])
+        subprocess.run(['python', join(BASE_DIR, "scrape_tron.py"), contract_address])
 
         response_data = {"message": "Contract address sent and processed successfully"}
 
