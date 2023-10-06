@@ -9,26 +9,30 @@ import requests
 import json
 from selenium.common.exceptions import NoSuchElementException
 
-# Inisialisasi WebDriver
-driver = webdriver.Edge(executable_path='../msedgedriver.exe')
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
+
+driver = webdriver.Chrome(options=chrome_options)
 wait = WebDriverWait(driver, 10)
 # Fungsi untuk melakukan scraping dan mengirim hasil ke server
 def scrape_and_send_results(contract_address):
     try:
-        
+
         driver.get('https://tronscan.org/#/tools/code-reader?')
 
         # Tunggu hingga tombol "I Understand" muncul (dengan waktu maksimum 10 detik)
         understand_button = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, '//button/span[contains(text(),"I Understand")]'))
         )
-        
+
         # Klik tombol "I Understand"
         understand_button.click()
 
         # Cari elemen input berdasarkan ID
         input_element = driver.find_element_by_id('form_key')
-        
+
         # Masukkan teks ke dalam input
         input_element.send_keys('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')
 
@@ -39,7 +43,7 @@ def scrape_and_send_results(contract_address):
         load_button.click()
         time.sleep(5)
 
-        
+
         if driver.find_elements_by_class_name('fileContractSelect'):
             file_contract_select = driver.find_element_by_class_name('fileContractSelect')
 
@@ -50,7 +54,7 @@ def scrape_and_send_results(contract_address):
             for i in range(1, len(checkbox_inputs)):
                 checkbox_inputs[i].click()
 
-            time.sleep(20)    
+            time.sleep(20)
                 # Tunggu hingga textarea muncul (dengan waktu maksimum 10 detik)
             textarea_wrapper = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'textarea-wrapper'))
@@ -68,7 +72,7 @@ def scrape_and_send_results(contract_address):
             submit_button = textarea_wrapper.find_element(By.CLASS_NAME, 'submit-btn')
             submit_button.click()
             time.sleep(30)
-                
+
             dialogue_element = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, '//div[@class="dialogue-wrapper"]//div[@class="dialogue"]'))
             )

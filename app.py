@@ -1,10 +1,12 @@
+
+# A very simple Flask Hello World app for you to get started with...
 import subprocess
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/api/*": {"origins": "https://zetta-ai-checker.vercel.app"}})
 
 # Variabel global untuk menyimpan hasil pencocokan
 matches_result = []
@@ -22,7 +24,7 @@ def process_contract():
         response_data = {"message": "Contract address sent and processed successfully"}
 
         return jsonify(response_data)
-    
+
     except Exception as e:
         return jsonify({"error": str(e)})
 
@@ -40,11 +42,8 @@ def receive_matches():
         elif request.method == 'GET':
             # Jika metode adalah GET, kirimkan data hasil pencocokan
             response_data = {"matches": matches_result, "basic_info": basic_info}
-        
+
         return jsonify(response_data)
-    
+
     except Exception as e:
         return jsonify({"error": str(e)})
-
-if __name__ == '__main__':
-    app.run(debug=True)
