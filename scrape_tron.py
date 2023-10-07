@@ -11,11 +11,11 @@ from selenium.common.exceptions import NoSuchElementException
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 
-driver = webdriver.Chrome(options=chrome_options)
-wait = WebDriverWait(driver, 10)
+driver = webdriver.Edge(options=chrome_options)
+wait = WebDriverWait(driver, 100)
 # Fungsi untuk melakukan scraping dan mengirim hasil ke server
 def scrape_and_send_results(contract_address):
     try:
@@ -29,26 +29,26 @@ def scrape_and_send_results(contract_address):
 
         # Klik tombol "I Understand"
         understand_button.click()
-
+        
         # Cari elemen input berdasarkan ID
-        input_element = driver.find_element_by_id('form_key')
+        input_element = driver.find_element(By.ID,'form_key')
 
         # Masukkan teks ke dalam input
         input_element.send_keys('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')
 
-        input_element = driver.find_element_by_css_selector('input[placeholder="Contract Address"]')
+        input_element = driver.find_element(By.CSS_SELECTOR,'input[placeholder="Contract Address"]')
         input_element.send_keys(contract_address)
 
-        load_button = driver.find_element_by_class_name('ant-btn-primary')
+        load_button = driver.find_element(By.CLASS_NAME,'ant-btn-primary')
         load_button.click()
         time.sleep(5)
 
 
-        if driver.find_elements_by_class_name('fileContractSelect'):
-            file_contract_select = driver.find_element_by_class_name('fileContractSelect')
+        if driver.find_element(By.CSS_SELECTOR,'#form > div.select-contract-file-wrapper > div.fileContractSelect'):
+            file_contract_select = driver.find_element(By.CLASS_NAME,'#form > div.select-contract-file-wrapper > div.fileContractSelect')
 
                 # Temukan semua elemen input checkbox dalam elemen "fileContractSelect"
-            checkbox_inputs = file_contract_select.find_elements_by_css_selector('input[type="checkbox"]')
+            checkbox_inputs = file_contract_select.find_element(By.CSS_SELECTOR,'input[type="checkbox"]')
 
                 # Loop melalui setiap input checkbox dan klik
             for i in range(1, len(checkbox_inputs)):
