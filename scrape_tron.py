@@ -14,7 +14,7 @@ chrome_options.add_argument("--no-sandbox")
 # chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 
-driver = webdriver.Edge(options=chrome_options)
+driver = webdriver.Chrome(options=chrome_options)
 wait = WebDriverWait(driver, 100)
 # Fungsi untuk melakukan scraping dan mengirim hasil ke server
 def scrape_and_send_results(contract_address):
@@ -43,21 +43,18 @@ def scrape_and_send_results(contract_address):
         load_button.click()
         time.sleep(5)
 
-
-        if driver.find_element(By.CSS_SELECTOR,'#form > div.select-contract-file-wrapper > div.fileContractSelect'):
-            file_contract_select = driver.find_element(By.CLASS_NAME,'#form > div.select-contract-file-wrapper > div.fileContractSelect')
-
-                # Temukan semua elemen input checkbox dalam elemen "fileContractSelect"
-            checkbox_inputs = file_contract_select.find_element(By.CSS_SELECTOR,'input[type="checkbox"]')
-
-                # Loop melalui setiap input checkbox dan klik
+        file_contract_select = driver.find_element(By.CSS_SELECTOR,'#form > div.select-contract-file-wrapper > div.fileContractSelect')
+        if file_contract_select:
+            # Temukan semua elemen input checkbox dalam elemen "fileContractSelect"
+            checkbox_inputs = file_contract_select.find_elements(By.CSS_SELECTOR,'input[type="checkbox"]')
+            # Loop melalui setiap input checkbox dan klik
             for i in range(1, len(checkbox_inputs)):
                 checkbox_inputs[i].click()
 
             time.sleep(20)
                 # Tunggu hingga textarea muncul (dengan waktu maksimum 10 detik)
             textarea_wrapper = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, 'textarea-wrapper'))
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#chat-wrapper-id > div.chat-input-wrapper > div'))
             )
 
                 # Temukan textarea di dalam wrapper
@@ -65,7 +62,6 @@ def scrape_and_send_results(contract_address):
 
                 # Masukkan data string ke dalam textarea
             data_string = 'Please make condition(yes/no) of each answer, Only with this format : "yes/no - explanation", I have 18 questions: 1. Does the Contract have a hidden owner?  ; 2. Does the contract have an admin privileges?  ; 3. Does the Contract look like a honeypot?  ; 4. Does the Contract Owner can change the balance token?  ; 5. Does the contract is proxy contract?  ; 6. Does the Contract have a whitelist?  ; 7. Does the Contract have a blacklist?  ; 8. Does the slippage can be modified on contract?  ; 9. Does the contract can take back ownership?  ; 10. Does the contract have a trading-cool-down mechanism?  ; 11. Does the contract can mint new tokens?  ; 12. Does the contract can burn the tokens?  13. Does the contract upgradeable?  14. Does the contract can be paused?  15. Does the contract have a cooldown feature?  16. Does the contract can establish or update Fees?  17. Does the contract was hardcoding addresses?  18. Does the contract use many functions that can only be called by the owner?  "notes: please make sure the answer aaccording to what is in the contract. *(Say "yes" if "the contract does" AND TELL US WHERE THE CODE IS LOCATED, Say "no" if "the contract does not") *(Dont repeat question)'
-
             textarea_element.send_keys(data_string)
 
                 # Temukan elemen tombol "Submit" dan klik
@@ -106,7 +102,7 @@ def scrape_and_send_results(contract_address):
         requests.post(server_url, json=all_data)
 
 
-    except Exception as e:
+    except NoSuchElementException as e:
         print("Tidak dapat menemukan elemen input atau mengirim teks ke dalamnya.", e)
 
     finally:
